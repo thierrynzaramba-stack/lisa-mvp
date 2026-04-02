@@ -3,22 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aura — Intelligence conversationnelle</title>
+  <title>Lisa</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0a0a0f;
-      --surface: #11111a;
-      --border: #1e1e2e;
+      --bg: #0a0a0a;
+      --surface: #111;
+      --border: #1e1e1e;
       --text: #e8e4da;
-      --muted: #6b6880;
-      --accent: #c8a96e;
-      --accent-dim: #c8a96e22;
-      --user-bg: #1a1a28;
-      --ai-bg: #0f0f18;
-      --danger: #e06c75;
-      --glow: #c8a96e18;
+      --muted: #555;
+      --accent: #c026d3;
+      --accent-dim: #c026d322;
+      --user-bg: #1a1a1a;
+      --ai-bg: #0f0f0f;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,47 +30,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow-x: hidden;
     }
 
-    /* Animated background grid */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 40px 40px;
-      opacity: 0.3;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      top: -50%;
-      left: 30%;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-      animation: drift 12s ease-in-out infinite alternate;
-    }
-
-    @keyframes drift {
-      from { transform: translate(0, 0) scale(1); }
-      to   { transform: translate(-80px, 60px) scale(1.15); }
-    }
-
-    /* Header */
     header {
-      position: relative;
-      z-index: 10;
       width: 100%;
-      max-width: 720px;
+      max-width: 680px;
       padding: 2rem 1.5rem 1rem;
       display: flex;
       align-items: baseline;
@@ -82,7 +44,7 @@
 
     .logo {
       font-family: 'Instrument Serif', serif;
-      font-size: 1.8rem;
+      font-size: 2rem;
       color: var(--accent);
       letter-spacing: -0.02em;
     }
@@ -94,27 +56,9 @@
       text-transform: uppercase;
     }
 
-    .credits-badge {
-      margin-left: auto;
-      font-size: 0.65rem;
-      color: var(--muted);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 0.3rem 0.7rem;
-      letter-spacing: 0.08em;
-    }
-
-    .credits-badge span {
-      color: var(--accent);
-      font-weight: 400;
-    }
-
-    /* Chat container */
     main {
-      position: relative;
-      z-index: 10;
       width: 100%;
-      max-width: 720px;
+      max-width: 680px;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -126,7 +70,7 @@
       padding: 2rem 0;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1.2rem;
       min-height: 60vh;
       max-height: 65vh;
       overflow-y: auto;
@@ -134,52 +78,42 @@
       scrollbar-color: var(--border) transparent;
     }
 
-    #messages:empty::before {
-      content: 'Commencez la conversation…';
-      color: var(--muted);
-      font-size: 0.8rem;
-      letter-spacing: 0.1em;
-      text-align: center;
-      margin: auto;
-      display: block;
-    }
-
     .msg {
       display: flex;
       flex-direction: column;
-      gap: 0.3rem;
-      animation: fadeUp 0.3s ease forwards;
+      gap: 0.25rem;
+      animation: fadeUp 0.25s ease forwards;
       opacity: 0;
     }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
+      from { opacity: 0; transform: translateY(6px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
     .msg-label {
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--muted);
     }
 
-    .msg.user .msg-label { color: var(--accent); opacity: 0.7; text-align: right; }
+    .msg.user .msg-label { color: var(--accent); opacity: 0.6; text-align: right; }
 
     .msg-bubble {
-      padding: 1rem 1.2rem;
+      padding: 0.9rem 1.1rem;
       border: 1px solid var(--border);
-      font-size: 0.85rem;
-      line-height: 1.7;
+      font-size: 0.88rem;
+      line-height: 1.75;
       white-space: pre-wrap;
     }
 
     .msg.user .msg-bubble {
       background: var(--user-bg);
-      border-color: #2a2a40;
+      border-color: #2a2a2a;
       text-align: right;
       align-self: flex-end;
-      max-width: 85%;
+      max-width: 82%;
     }
 
     .msg.ai .msg-bubble {
@@ -188,11 +122,24 @@
       max-width: 100%;
     }
 
-    /* Typing indicator */
+    .lisa-pay-link {
+      display: inline-block;
+      margin-top: 0.5rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--accent-dim);
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .lisa-pay-link:hover { opacity: 0.75; }
+
     .typing {
       display: flex;
       gap: 4px;
-      padding: 1rem 1.2rem;
+      padding: 0.9rem 1.1rem;
       background: var(--ai-bg);
       border: 1px solid var(--border);
       border-left: 2px solid var(--accent);
@@ -213,7 +160,6 @@
       40% { opacity: 1; }
     }
 
-    /* Input area */
     .input-area {
       border-top: 1px solid var(--border);
       padding: 1.2rem 0 2rem;
@@ -228,7 +174,7 @@
       border: 1px solid var(--border);
       color: var(--text);
       font-family: 'DM Mono', monospace;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       font-weight: 300;
       padding: 0.9rem 1rem;
       resize: none;
@@ -241,39 +187,32 @@
 
     textarea:focus { border-color: var(--accent); }
     textarea::placeholder { color: var(--muted); }
-
-    textarea:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
+    textarea:disabled { opacity: 0.3; cursor: not-allowed; }
 
     button#send-btn {
       background: var(--accent);
-      color: #0a0a0f;
+      color: #fff;
       border: none;
       font-family: 'DM Mono', monospace;
       font-size: 0.7rem;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       padding: 0 1.4rem;
       height: 52px;
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      white-space: nowrap;
+      transition: opacity 0.2s;
     }
 
     button#send-btn:hover { opacity: 0.85; }
-    button#send-btn:active { transform: scale(0.97); }
-    button#send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    button#send-btn:disabled { opacity: 0.25; cursor: not-allowed; }
 
-    /* Paywall overlay */
     #paywall {
       display: none;
       position: fixed;
       inset: 0;
       z-index: 100;
-      background: #0a0a0fee;
-      backdrop-filter: blur(8px);
+      background: #0a0a0aee;
+      backdrop-filter: blur(6px);
       align-items: center;
       justify-content: center;
       padding: 2rem;
@@ -284,19 +223,10 @@
     .paywall-card {
       background: var(--surface);
       border: 1px solid var(--accent);
-      max-width: 440px;
+      max-width: 420px;
       width: 100%;
-      padding: 3rem 2.5rem;
-      position: relative;
-      animation: fadeUp 0.4s ease forwards;
-    }
-
-    .paywall-card::before {
-      content: '';
-      position: absolute;
-      inset: -1px;
-      background: linear-gradient(135deg, var(--accent-dim), transparent 60%);
-      pointer-events: none;
+      padding: 2.5rem 2rem;
+      animation: fadeUp 0.3s ease forwards;
     }
 
     .paywall-eyebrow {
@@ -304,52 +234,50 @@
       letter-spacing: 0.25em;
       text-transform: uppercase;
       color: var(--accent);
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
     }
 
     .paywall-title {
       font-family: 'Instrument Serif', serif;
-      font-size: 2rem;
+      font-size: 1.8rem;
       line-height: 1.2;
-      margin-bottom: 1rem;
-      color: var(--text);
+      margin-bottom: 0.8rem;
     }
 
     .paywall-desc {
       font-size: 0.78rem;
       color: var(--muted);
       line-height: 1.8;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
     .paywall-price {
       font-family: 'Instrument Serif', serif;
-      font-size: 2.5rem;
+      font-size: 2.2rem;
       color: var(--accent);
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.2rem;
     }
 
     .paywall-price-note {
-      font-size: 0.65rem;
+      font-size: 0.63rem;
       color: var(--muted);
       letter-spacing: 0.1em;
-      margin-bottom: 2rem;
+      margin-bottom: 1.8rem;
     }
 
     .btn-pay {
       width: 100%;
       background: var(--accent);
-      color: #0a0a0f;
+      color: #fff;
       border: none;
       font-family: 'DM Mono', monospace;
       font-size: 0.75rem;
-      font-weight: 400;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       padding: 1rem;
       cursor: pointer;
       transition: opacity 0.2s;
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
     }
 
     .btn-pay:hover { opacity: 0.85; }
@@ -360,16 +288,15 @@
       color: var(--muted);
       border: 1px solid var(--border);
       font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       letter-spacing: 0.1em;
-      padding: 0.8rem;
+      padding: 0.75rem;
       cursor: pointer;
       transition: color 0.2s;
     }
 
     .btn-dismiss:hover { color: var(--text); }
 
-    /* Success banner */
     #success-banner {
       display: none;
       position: fixed;
@@ -377,13 +304,12 @@
       left: 50%;
       transform: translateX(-50%);
       background: var(--accent);
-      color: #0a0a0f;
+      color: #fff;
       font-size: 0.7rem;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      padding: 0.8rem 2rem;
+      padding: 0.75rem 2rem;
       z-index: 200;
-      animation: fadeUp 0.3s ease forwards;
     }
 
     #success-banner.show { display: block; }
@@ -392,102 +318,94 @@
 <body>
 
 <header>
-  <div class="logo">Aura</div>
-  <div class="tagline">IA conversationnelle</div>
-  <div class="credits-badge">Messages gratuits : <span id="credits-left">3</span></div>
+  <div class="logo">Lisa</div>
+  <div class="tagline">Dis-moi ce que tu portes.</div>
 </header>
 
 <main>
   <div id="messages"></div>
-
   <div class="input-area">
-    <textarea id="input" rows="1" placeholder="Écrivez votre message…" autofocus></textarea>
+    <textarea id="input" rows="1" placeholder="Écris ici…" autofocus></textarea>
     <button id="send-btn">Envoyer</button>
   </div>
 </main>
 
-<!-- Paywall -->
 <div id="paywall">
   <div class="paywall-card">
-    <div class="paywall-eyebrow">Accès complet</div>
-    <div class="paywall-title">Continuez sans limite</div>
+    <div class="paywall-eyebrow">Continuer avec Lisa</div>
+    <div class="paywall-title">Tu mérites d'aller jusqu'au bout.</div>
     <div class="paywall-desc">
-      Vous avez atteint la limite de votre conversation gratuite.<br/>
-      Débloquez un accès illimité pour continuer avec Aura.
+      Cette conversation peut aller plus loin.<br/>
+      Débloque un accès illimité pour continuer avec Lisa.
     </div>
     <div class="paywall-price">9€</div>
     <div class="paywall-price-note">Paiement unique · Accès à vie</div>
-    <button class="btn-pay" id="pay-btn">Débloquer l'accès →</button>
-    <button class="btn-dismiss" id="dismiss-btn">Peut-être plus tard</button>
+    <button class="btn-pay" id="pay-btn">Continuer →</button>
+    <button class="btn-dismiss" id="dismiss-btn">Pas maintenant</button>
   </div>
 </div>
 
-<div id="success-banner">✓ Accès débloqué — bienvenue !</div>
+<div id="success-banner">✓ Accès débloqué</div>
 
 <script>
-  const PAID_KEY = 'aura_paid';
-  const HISTORY_KEY = 'aura_history';
-  const FREE_LIMIT = 3;
-
-  let messageCount = 0;
+  const PAID_KEY = 'lisa_paid';
   let isPaid = localStorage.getItem(PAID_KEY) === 'true';
   let history = [];
-  let paywallTriggered = false;
 
   const messagesEl = document.getElementById('messages');
   const inputEl    = document.getElementById('input');
   const sendBtn    = document.getElementById('send-btn');
-  const creditsEl  = document.getElementById('credits-left');
   const paywall    = document.getElementById('paywall');
   const payBtn     = document.getElementById('pay-btn');
   const dismissBtn = document.getElementById('dismiss-btn');
   const banner     = document.getElementById('success-banner');
 
-  // Update credits display
-  function updateCredits() {
-    if (isPaid) {
-      creditsEl.parentElement.textContent = '✓ Accès illimité';
-      creditsEl.parentElement.style.color = 'var(--accent)';
-    } else {
-      creditsEl.textContent = Math.max(0, FREE_LIMIT - messageCount);
-    }
-  }
+  addMessage('ai', "Salut... T'es venu pour te vider ? Dis-moi un mot.");
 
-  // Add message to UI
-  function addMessage(role, text) {
+  function addMessage(role, text, isHTML = false) {
     const div = document.createElement('div');
     div.className = `msg ${role}`;
-    div.innerHTML = `
-      <div class="msg-label">${role === 'user' ? 'Vous' : 'Aura'}</div>
-      <div class="msg-bubble">${text}</div>
-    `;
+    const label = document.createElement('div');
+    label.className = 'msg-label';
+    label.textContent = role === 'user' ? 'Toi' : 'Lisa';
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    if (isHTML) {
+      bubble.innerHTML = text;
+      const payLink = bubble.querySelector('.lisa-pay-link');
+      if (payLink) {
+        payLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          showPaywall();
+        });
+      }
+    } else {
+      bubble.textContent = text;
+    }
+    div.appendChild(label);
+    div.appendChild(bubble);
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
-    return div;
   }
 
-  // Add typing indicator
   function addTyping() {
     const div = document.createElement('div');
     div.className = 'msg ai';
     div.id = 'typing';
     div.innerHTML = `
-      <div class="msg-label">Aura</div>
+      <div class="msg-label">Lisa</div>
       <div class="typing"><span></span><span></span><span></span></div>
     `;
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
-    return div;
   }
 
-  // Show paywall
   function showPaywall() {
     paywall.classList.add('show');
     inputEl.disabled = true;
     sendBtn.disabled = true;
   }
 
-  // Send message
   async function sendMessage() {
     const text = inputEl.value.trim();
     if (!text) return;
@@ -499,52 +417,34 @@
 
     addMessage('user', text);
     history.push({ role: 'user', content: text });
-    messageCount++;
-    updateCredits();
 
-    const typing = addTyping();
+    addTyping();
 
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: history,
-          messageCount,
-          isPaid,
-          freeLimit: FREE_LIMIT
-        })
+        body: JSON.stringify({ messages: history, isPaid })
       });
 
       const data = await res.json();
-      typing.remove();
+      document.getElementById('typing')?.remove();
 
-      addMessage('ai', data.reply);
+      addMessage('ai', data.reply, data.hasPayLink);
       history.push({ role: 'assistant', content: data.reply });
 
-      // Trigger paywall if AI says so OR free limit reached
-      if (!isPaid && (data.triggerPaywall || messageCount >= FREE_LIMIT)) {
-        paywallTriggered = true;
-        setTimeout(showPaywall, 800);
-      } else if (!isPaid) {
-        inputEl.disabled = false;
-        sendBtn.disabled = false;
-        inputEl.focus();
-      } else {
-        inputEl.disabled = false;
-        sendBtn.disabled = false;
-        inputEl.focus();
-      }
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+      inputEl.focus();
 
-    } catch (e) {
-      typing.remove();
-      addMessage('ai', 'Une erreur est survenue. Veuillez réessayer.');
+    } catch {
+      document.getElementById('typing')?.remove();
+      addMessage('ai', "J'ai un souci technique... réessaie.");
       inputEl.disabled = false;
       sendBtn.disabled = false;
     }
   }
 
-  // Auto-resize textarea
   inputEl.addEventListener('input', () => {
     inputEl.style.height = 'auto';
     inputEl.style.height = Math.min(inputEl.scrollHeight, 140) + 'px';
@@ -559,7 +459,6 @@
 
   sendBtn.addEventListener('click', sendMessage);
 
-  // Stripe payment
   payBtn.addEventListener('click', async () => {
     payBtn.textContent = 'Redirection…';
     payBtn.disabled = true;
@@ -575,10 +474,8 @@
 
   dismissBtn.addEventListener('click', () => {
     paywall.classList.remove('show');
-    // Let them read but not type
   });
 
-  // Check if returning from Stripe success
   const params = new URLSearchParams(window.location.search);
   if (params.get('success') === '1') {
     isPaid = true;
@@ -586,12 +483,7 @@
     banner.classList.add('show');
     setTimeout(() => banner.classList.remove('show'), 4000);
     window.history.replaceState({}, '', '/');
-    inputEl.disabled = false;
-    sendBtn.disabled = false;
-    updateCredits();
   }
-
-  updateCredits();
 </script>
 </body>
 </html>
