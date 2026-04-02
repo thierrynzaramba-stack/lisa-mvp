@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aura — Intelligence conversationnelle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #11111a;
+      --border: #1e1e2e;
+      --text: #e8e4da;
+      --muted: #6b6880;
+      --accent: #c8a96e;
+      --accent-dim: #c8a96e22;
+      --user-bg: #1a1a28;
+      --ai-bg: #0f0f18;
+      --danger: #e06c75;
+      --glow: #c8a96e18;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: 30%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(-80px, 60px) scale(1.15); }
+    }
+
+    /* Header */
+    header {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 720px;
+      padding: 2rem 1.5rem 1rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.8rem;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+    }
+
+    .tagline {
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .credits-badge {
+      margin-left: auto;
+      font-size: 0.65rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.7rem;
+      letter-spacing: 0.08em;
+    }
+
+    .credits-badge span {
+      color: var(--accent);
+      font-weight: 400;
+    }
+
+    /* Chat container */
+    main {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 720px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 0 1.5rem;
+    }
+
+    #messages {
+      flex: 1;
+      padding: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      min-height: 60vh;
+      max-height: 65vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    #messages:empty::before {
+      content: 'Commencez la conversation…';
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-align: center;
+      margin: auto;
+      display: block;
+    }
+
+    .msg {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      animation: fadeUp 0.3s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .msg.user .msg-label { color: var(--accent); opacity: 0.7; text-align: right; }
+
+    .msg-bubble {
+      padding: 1rem 1.2rem;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .msg.user .msg-bubble {
+      background: var(--user-bg);
+      border-color: #2a2a40;
+      text-align: right;
+      align-self: flex-end;
+      max-width: 85%;
+    }
+
+    .msg.ai .msg-bubble {
+      background: var(--ai-bg);
+      border-left: 2px solid var(--accent);
+      max-width: 100%;
+    }
+
+    /* Typing indicator */
+    .typing {
+      display: flex;
+      gap: 4px;
+      padding: 1rem 1.2rem;
+      background: var(--ai-bg);
+      border: 1px solid var(--border);
+      border-left: 2px solid var(--accent);
+      width: fit-content;
+    }
+
+    .typing span {
+      width: 5px; height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: blink 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.2; }
+      40% { opacity: 1; }
+    }
+
+    /* Input area */
+    .input-area {
+      border-top: 1px solid var(--border);
+      padding: 1.2rem 0 2rem;
+      display: flex;
+      gap: 0.8rem;
+      align-items: flex-end;
+    }
+
+    textarea {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 300;
+      padding: 0.9rem 1rem;
+      resize: none;
+      min-height: 52px;
+      max-height: 140px;
+      outline: none;
+      transition: border-color 0.2s;
+      line-height: 1.5;
+    }
+
+    textarea:focus { border-color: var(--accent); }
+    textarea::placeholder { color: var(--muted); }
+
+    textarea:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    button#send-btn {
+      background: var(--accent);
+      color: #0a0a0f;
+      border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0 1.4rem;
+      height: 52px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    button#send-btn:hover { opacity: 0.85; }
+    button#send-btn:active { transform: scale(0.97); }
+    button#send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* Paywall overlay */
+    #paywall {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: #0a0a0fee;
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    #paywall.show { display: flex; }
+
+    .paywall-card {
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      max-width: 440px;
+      width: 100%;
+      padding: 3rem 2.5rem;
+      position: relative;
+      animation: fadeUp 0.4s ease forwards;
+    }
+
+    .paywall-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(135deg, var(--accent-dim), transparent 60%);
+      pointer-events: none;
+    }
+
+    .paywall-eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .paywall-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 2rem;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .paywall-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .paywall-price {
+      font-family: 'Instrument Serif', serif;
+      font-size: 2.5rem;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+
+    .paywall-price-note {
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      margin-bottom: 2rem;
+    }
+
+    .btn-pay {
+      width: 100%;
+      background: var(--accent);
+      color: #0a0a0f;
+      border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 1rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-bottom: 1rem;
+    }
+
+    .btn-pay:hover { opacity: 0.85; }
+
+    .btn-dismiss {
+      width: 100%;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      padding: 0.8rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .btn-dismiss:hover { color: var(--text); }
+
+    /* Success banner */
+    #success-banner {
+      display: none;
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: #0a0a0f;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.8rem 2rem;
+      z-index: 200;
+      animation: fadeUp 0.3s ease forwards;
+    }
+
+    #success-banner.show { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Aura</div>
+  <div class="tagline">IA conversationnelle</div>
+  <div class="credits-badge">Messages gratuits : <span id="credits-left">3</span></div>
+</header>
+
+<main>
+  <div id="messages"></div>
+
+  <div class="input-area">
+    <textarea id="input" rows="1" placeholder="Écrivez votre message…" autofocus></textarea>
+    <button id="send-btn">Envoyer</button>
+  </div>
+</main>
+
+<!-- Paywall -->
+<div id="paywall">
+  <div class="paywall-card">
+    <div class="paywall-eyebrow">Accès complet</div>
+    <div class="paywall-title">Continuez sans limite</div>
+    <div class="paywall-desc">
+      Vous avez atteint la limite de votre conversation gratuite.<br/>
+      Débloquez un accès illimité pour continuer avec Aura.
+    </div>
+    <div class="paywall-price">9€</div>
+    <div class="paywall-price-note">Paiement unique · Accès à vie</div>
+    <button class="btn-pay" id="pay-btn">Débloquer l'accès →</button>
+    <button class="btn-dismiss" id="dismiss-btn">Peut-être plus tard</button>
+  </div>
+</div>
+
+<div id="success-banner">✓ Accès débloqué — bienvenue !</div>
+
+<script>
+  const PAID_KEY = 'aura_paid';
+  const HISTORY_KEY = 'aura_history';
+  const FREE_LIMIT = 3;
+
+  let messageCount = 0;
+  let isPaid = localStorage.getItem(PAID_KEY) === 'true';
+  let history = [];
+  let paywallTriggered = false;
+
+  const messagesEl = document.getElementById('messages');
+  const inputEl    = document.getElementById('input');
+  const sendBtn    = document.getElementById('send-btn');
+  const creditsEl  = document.getElementById('credits-left');
+  const paywall    = document.getElementById('paywall');
+  const payBtn     = document.getElementById('pay-btn');
+  const dismissBtn = document.getElementById('dismiss-btn');
+  const banner     = document.getElementById('success-banner');
+
+  // Update credits display
+  function updateCredits() {
+    if (isPaid) {
+      creditsEl.parentElement.textContent = '✓ Accès illimité';
+      creditsEl.parentElement.style.color = 'var(--accent)';
+    } else {
+      creditsEl.textContent = Math.max(0, FREE_LIMIT - messageCount);
+    }
+  }
+
+  // Add message to UI
+  function addMessage(role, text) {
+    const div = document.createElement('div');
+    div.className = `msg ${role}`;
+    div.innerHTML = `
+      <div class="msg-label">${role === 'user' ? 'Vous' : 'Aura'}</div>
+      <div class="msg-bubble">${text}</div>
+    `;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return div;
+  }
+
+  // Add typing indicator
+  function addTyping() {
+    const div = document.createElement('div');
+    div.className = 'msg ai';
+    div.id = 'typing';
+    div.innerHTML = `
+      <div class="msg-label">Aura</div>
+      <div class="typing"><span></span><span></span><span></span></div>
+    `;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return div;
+  }
+
+  // Show paywall
+  function showPaywall() {
+    paywall.classList.add('show');
+    inputEl.disabled = true;
+    sendBtn.disabled = true;
+  }
+
+  // Send message
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+    inputEl.disabled = true;
+
+    addMessage('user', text);
+    history.push({ role: 'user', content: text });
+    messageCount++;
+    updateCredits();
+
+    const typing = addTyping();
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: history,
+          messageCount,
+          isPaid,
+          freeLimit: FREE_LIMIT
+        })
+      });
+
+      const data = await res.json();
+      typing.remove();
+
+      addMessage('ai', data.reply);
+      history.push({ role: 'assistant', content: data.reply });
+
+      // Trigger paywall if AI says so OR free limit reached
+      if (!isPaid && (data.triggerPaywall || messageCount >= FREE_LIMIT)) {
+        paywallTriggered = true;
+        setTimeout(showPaywall, 800);
+      } else if (!isPaid) {
+        inputEl.disabled = false;
+        sendBtn.disabled = false;
+        inputEl.focus();
+      } else {
+        inputEl.disabled = false;
+        sendBtn.disabled = false;
+        inputEl.focus();
+      }
+
+    } catch (e) {
+      typing.remove();
+      addMessage('ai', 'Une erreur est survenue. Veuillez réessayer.');
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+    }
+  }
+
+  // Auto-resize textarea
+  inputEl.addEventListener('input', () => {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = Math.min(inputEl.scrollHeight, 140) + 'px';
+  });
+
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  sendBtn.addEventListener('click', sendMessage);
+
+  // Stripe payment
+  payBtn.addEventListener('click', async () => {
+    payBtn.textContent = 'Redirection…';
+    payBtn.disabled = true;
+    try {
+      const res = await fetch('/api/create-checkout', { method: 'POST' });
+      const { url } = await res.json();
+      window.location.href = url;
+    } catch {
+      payBtn.textContent = 'Erreur — Réessayer';
+      payBtn.disabled = false;
+    }
+  });
+
+  dismissBtn.addEventListener('click', () => {
+    paywall.classList.remove('show');
+    // Let them read but not type
+  });
+
+  // Check if returning from Stripe success
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('success') === '1') {
+    isPaid = true;
+    localStorage.setItem(PAID_KEY, 'true');
+    banner.classList.add('show');
+    setTimeout(() => banner.classList.remove('show'), 4000);
+    window.history.replaceState({}, '', '/');
+    inputEl.disabled = false;
+    sendBtn.disabled = false;
+    updateCredits();
+  }
+
+  updateCredits();
+</script>
+</body>
+</html>
