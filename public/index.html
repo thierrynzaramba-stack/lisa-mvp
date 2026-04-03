@@ -32,10 +32,7 @@
       align-items: center;
     }
 
-    /* --------------------------------------------------------
-       ÉCRAN DE VÉRIFICATION D'ÂGE
-       Affiché à la première visite — bloque les mineurs
-    -------------------------------------------------------- */
+    /* Age gate */
     #age-gate {
       display: none;
       position: fixed;
@@ -48,7 +45,6 @@
       padding: 2rem;
       text-align: center;
     }
-
     #age-gate.show { display: flex; }
 
     .age-gate-logo {
@@ -73,10 +69,7 @@
       line-height: 1.4;
     }
 
-    .age-gate-buttons {
-      display: flex;
-      gap: 1rem;
-    }
+    .age-gate-buttons { display: flex; gap: 1rem; }
 
     .btn-major {
       background: var(--accent);
@@ -102,14 +95,9 @@
       text-transform: uppercase;
       padding: 1rem 2rem;
       cursor: pointer;
-      transition: color 0.2s;
     }
-    .btn-minor:hover { color: var(--text); }
 
-    /* --------------------------------------------------------
-       ÉCRAN MINEUR BANNI
-       Affiché si l'utilisateur dit qu'il a moins de 18 ans
-    -------------------------------------------------------- */
+    /* Banned */
     #banned-screen {
       display: none;
       position: fixed;
@@ -122,14 +110,12 @@
       padding: 2rem;
       text-align: center;
     }
-
     #banned-screen.show { display: flex; }
 
     .banned-title {
       font-family: 'Instrument Serif', serif;
       font-size: 2rem;
       margin-bottom: 1rem;
-      color: var(--text);
     }
 
     .banned-text {
@@ -139,9 +125,7 @@
       max-width: 360px;
     }
 
-    /* --------------------------------------------------------
-       HEADER
-    -------------------------------------------------------- */
+    /* Header */
     header {
       width: 100%;
       max-width: 680px;
@@ -165,7 +149,6 @@
       text-transform: uppercase;
     }
 
-    /* Badge session active (mode payant) */
     #session-badge {
       display: none;
       margin-left: auto;
@@ -177,9 +160,7 @@
     }
     #session-badge.show { display: block; }
 
-    /* --------------------------------------------------------
-       CHAT
-    -------------------------------------------------------- */
+    /* Chat */
     main {
       width: 100%;
       max-width: 680px;
@@ -229,7 +210,6 @@
       border: 1px solid var(--border);
       font-size: 0.88rem;
       line-height: 1.75;
-      white-space: pre-wrap;
     }
 
     .msg.user .msg-bubble {
@@ -238,12 +218,29 @@
       text-align: right;
       align-self: flex-end;
       max-width: 82%;
+      white-space: pre-wrap;
     }
 
     .msg.ai .msg-bubble {
       background: var(--ai-bg);
       border-left: 2px solid var(--accent);
       max-width: 100%;
+    }
+
+    /* Curseur clignotant pendant l'effet machine à écrire */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--accent);
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      animation: cursorBlink 0.7s infinite;
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
 
     /* Lien de paiement dans la bulle */
@@ -260,7 +257,7 @@
     }
     .lisa-pay-link:hover { opacity: 0.75; }
 
-    /* Typing */
+    /* Typing dots (pendant l'appel API) */
     .typing {
       display: flex;
       gap: 4px;
@@ -284,7 +281,7 @@
       40% { opacity: 1; }
     }
 
-    /* Zone de saisie */
+    /* Input */
     .input-area {
       border-top: 1px solid var(--border);
       padding: 1.2rem 0 2rem;
@@ -356,9 +353,7 @@
       text-transform: uppercase;
       padding: 1rem 2rem;
       cursor: pointer;
-      transition: opacity 0.2s;
     }
-    .btn-end-pay:hover { opacity: 0.85; }
 
     /* Paywall */
     #paywall {
@@ -442,10 +437,8 @@
       text-transform: uppercase;
       padding: 1rem;
       cursor: pointer;
-      transition: opacity 0.2s;
       margin-bottom: 0.8rem;
     }
-    .btn-pay:hover { opacity: 0.85; }
 
     .btn-dismiss {
       width: 100%;
@@ -457,9 +450,7 @@
       letter-spacing: 0.1em;
       padding: 0.75rem;
       cursor: pointer;
-      transition: color 0.2s;
     }
-    .btn-dismiss:hover { color: var(--text); }
 
     #success-banner {
       display: none;
@@ -480,10 +471,6 @@
 </head>
 <body>
 
-<!-- ============================================================
-     ÉCRAN VÉRIFICATION ÂGE
-     Affiché à chaque première visite (ou si localStorage vide)
-============================================================ -->
 <div id="age-gate">
   <div class="age-gate-logo">Lisa</div>
   <div class="age-gate-title">Service réservé aux adultes</div>
@@ -494,9 +481,6 @@
   </div>
 </div>
 
-<!-- ============================================================
-     ÉCRAN BANNI (mineur)
-============================================================ -->
 <div id="banned-screen">
   <div class="banned-title">Accès refusé.</div>
   <div class="banned-text">
@@ -505,30 +489,24 @@
   </div>
 </div>
 
-<!-- ============================================================
-     INTERFACE PRINCIPALE
-============================================================ -->
 <header>
   <div class="logo">Lisa</div>
   <div class="tagline">Dis-moi ce que tu portes.</div>
-  <div id="session-badge">✓ Session active — <span id="session-timer"></span></div>
+  <div id="session-badge">✓ Session — <span id="session-timer"></span></div>
 </header>
 
 <main>
   <div id="messages"></div>
-
   <div class="input-area" id="input-area">
     <textarea id="input" rows="1" placeholder="Écris ici…"></textarea>
     <button id="send-btn">Envoyer</button>
   </div>
-
   <div id="end-chat-banner">
     <div class="end-chat-text">Cette conversation est terminée.</div>
     <button class="btn-end-pay" id="end-pay-btn">Reprendre pour 3.99€ →</button>
   </div>
 </main>
 
-<!-- Paywall -->
 <div id="paywall">
   <div class="paywall-card">
     <div class="paywall-eyebrow">Session 24h avec Lisa</div>
@@ -551,25 +529,23 @@
 <div id="success-banner">✓ Session activée — bienvenue</div>
 
 <script>
-  // ============================================================
-  // CLÉS LOCALSTORAGE
-  // ============================================================
-  const KEY_AGE       = 'lisa_age_ok';      // Vérification âge
-  const KEY_BANNED    = 'lisa_banned';       // Mineur banni
-  const KEY_SESSION   = 'lisa_session';      // Session payante
-  const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24h en ms
+  const KEY_AGE      = 'lisa_age_ok';
+  const KEY_BANNED   = 'lisa_banned';
+  const KEY_SESSION  = 'lisa_session';
+  const SESSION_DURATION = 24 * 60 * 60 * 1000;
 
-  // ============================================================
-  // ÉTAT DE L'APPLICATION
-  // ============================================================
-  let isPaid      = false;   // Session payante active
-  let history     = [];      // Historique de conversation
-  let currentLoop = 1;       // Boucle de vente en cours (1-3)
+  // Vitesse machine à écrire — lent = effet théâtral
+  // Valeur en ms entre chaque caractère
+  // Les emojis ont un délai plus long pour les mettre en valeur
+  const CHAR_SPEED_NORMAL = 38;  // ms par caractère normal
+  const CHAR_SPEED_EMOJI  = 180; // ms pour les emojis — pause dramatique
+
+  let isPaid      = false;
+  let history     = [];
+  let currentLoop = 1;
   let loopPayLinkShown = false;
+  let isTyping    = false; // Empêche d'envoyer pendant l'effet machine à écrire
 
-  // ============================================================
-  // ÉLÉMENTS DOM
-  // ============================================================
   const ageGate      = document.getElementById('age-gate');
   const bannedScreen = document.getElementById('banned-screen');
   const messagesEl   = document.getElementById('messages');
@@ -586,130 +562,101 @@
   const banner       = document.getElementById('success-banner');
 
   // ============================================================
-  // INITIALISATION — vérifie l'état au chargement
+  // DÉTECTION DES EMOJIS
+  // Segmente le texte en caractères normaux et emojis
+  // pour appliquer des vitesses différentes
   // ============================================================
-  function init() {
+  function segmentText(text) {
+    // Regex qui détecte les emojis (séquences Unicode)
+    const emojiRegex = /(\p{Emoji_Presentation}|\p{Extended_Pictographic})/gu;
+    const segments = [];
+    let lastIndex = 0;
+    let match;
 
-    // 1. Mineur déjà banni → écran bloqué définitivement
-    if (localStorage.getItem(KEY_BANNED) === 'true') {
-      bannedScreen.classList.add('show');
-      return;
+    while ((match = emojiRegex.exec(text)) !== null) {
+      // Texte avant l'emoji
+      if (match.index > lastIndex) {
+        const chunk = text.slice(lastIndex, match.index);
+        for (const char of chunk) {
+          segments.push({ char, isEmoji: false });
+        }
+      }
+      // L'emoji lui-même
+      segments.push({ char: match[0], isEmoji: true });
+      lastIndex = match.index + match[0].length;
     }
 
-    // 2. Vérification d'âge pas encore faite → afficher l'écran
-    if (!localStorage.getItem(KEY_AGE)) {
-      ageGate.classList.add('show');
-      return;
+    // Reste du texte après le dernier emoji
+    if (lastIndex < text.length) {
+      const chunk = text.slice(lastIndex);
+      for (const char of chunk) {
+        segments.push({ char, isEmoji: false });
+      }
     }
 
-    // 3. Âge vérifié → charger la session si elle existe
-    loadSession();
-    startChat();
+    return segments;
   }
 
   // ============================================================
-  // VÉRIFICATION D'ÂGE
+  // EFFET MACHINE À ÉCRIRE
+  // Affiche le texte caractère par caractère avec curseur
+  // Les emojis ont une pause plus longue — effet dramatique
   // ============================================================
-  document.getElementById('btn-yes').addEventListener('click', () => {
-    // Majeur confirmé → on stocke et on lance le chat
-    localStorage.setItem(KEY_AGE, 'true');
-    ageGate.classList.remove('show');
-    loadSession();
-    startChat();
-  });
+  function typewriterEffect(bubble, text, onComplete) {
+    isTyping = true;
+    sendBtn.disabled = true;
+    inputEl.disabled = true;
 
-  document.getElementById('btn-no').addEventListener('click', () => {
-    // Mineur → bannissement permanent
-    localStorage.setItem(KEY_BANNED, 'true');
-    ageGate.classList.remove('show');
-    bannedScreen.classList.add('show');
-  });
+    const segments = segmentText(text);
+    let index = 0;
 
-  // ============================================================
-  // GESTION DE LA SESSION PAYANTE (localStorage 24h)
-  // ============================================================
-  function loadSession() {
-    const raw = localStorage.getItem(KEY_SESSION);
-    if (!raw) return;
+    // Curseur clignotant
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    bubble.appendChild(cursor);
 
-    const session = JSON.parse(raw);
-    const now = Date.now();
-
-    // Session expirée → on la supprime
-    if (now > session.expires) {
-      localStorage.removeItem(KEY_SESSION);
-      return;
-    }
-
-    // Session encore valide
-    isPaid   = true;
-    history  = session.history || [];
-
-    // Affiche le badge de session avec le temps restant
-    updateSessionBadge(session.expires);
-  }
-
-  function saveSession() {
-    // Sauvegarde l'historique dans la session en cours
-    const raw = localStorage.getItem(KEY_SESSION);
-    if (!raw) return;
-    const session = JSON.parse(raw);
-    session.history = history;
-    localStorage.setItem(KEY_SESSION, JSON.stringify(session));
-  }
-
-  function createSession() {
-    // Crée une nouvelle session de 24h après paiement
-    const session = {
-      paidAt:  Date.now(),
-      expires: Date.now() + SESSION_DURATION,
-      history: history, // On garde la conversation déjà commencée
-    };
-    localStorage.setItem(KEY_SESSION, JSON.stringify(session));
-    isPaid = true;
-    updateSessionBadge(session.expires);
-  }
-
-  function updateSessionBadge(expires) {
-    // Affiche le temps restant dans le header
-    sessionBadge.classList.add('show');
-
-    function tick() {
-      const remaining = expires - Date.now();
-      if (remaining <= 0) {
-        sessionBadge.classList.remove('show');
-        isPaid = false;
+    function typeNext() {
+      if (index >= segments.length) {
+        // Fin de l'animation — retire le curseur
+        cursor.remove();
+        isTyping = false;
+        if (onComplete) onComplete();
         return;
       }
-      const h = Math.floor(remaining / 3600000);
-      const m = Math.floor((remaining % 3600000) / 60000);
-      sessionTimer.textContent = `${h}h${m < 10 ? '0' : ''}${m} restantes`;
+
+      const segment = segments[index];
+      index++;
+
+      // Insère le caractère avant le curseur
+      const textNode = document.createTextNode(segment.char);
+      bubble.insertBefore(textNode, cursor);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      // Délai variable selon le type de caractère
+      let delay = CHAR_SPEED_NORMAL;
+
+      if (segment.isEmoji) {
+        delay = CHAR_SPEED_EMOJI; // Pause dramatique sur les emojis
+      } else if (segment.char === '.') {
+        delay = CHAR_SPEED_NORMAL * 4; // Pause sur les points
+      } else if (segment.char === ',') {
+        delay = CHAR_SPEED_NORMAL * 2; // Légère pause sur les virgules
+      } else if (segment.char === '…') {
+        delay = CHAR_SPEED_NORMAL * 5; // Longue pause sur les ellipses
+      } else if (segment.char === '\n') {
+        delay = CHAR_SPEED_NORMAL * 3; // Pause sur les sauts de ligne
+      }
+
+      setTimeout(typeNext, delay);
     }
 
-    tick();
-    setInterval(tick, 60000); // Met à jour toutes les minutes
+    typeNext();
   }
 
   // ============================================================
-  // DÉMARRAGE DU CHAT
+  // AJOUTER UN MESSAGE
   // ============================================================
-  function startChat() {
-    // Si session payante avec historique → restaurer la conversation
-    if (isPaid && history.length > 0) {
-      history.forEach(msg => {
-        addMessage(msg.role === 'user' ? 'user' : 'ai', msg.content);
-      });
-      addMessage('ai', "Te revoilà. On reprend là où on en était ?");
-    } else {
-      // Nouveau chat
-      addMessage('ai', "Salut... T'es venu pour te vider ? Dis-moi un mot.");
-    }
-  }
-
-  // ============================================================
-  // MESSAGES
-  // ============================================================
-  function addMessage(role, text, isHTML = false) {
+  function addMessage(role, text, isHTML = false, animate = false) {
     const div = document.createElement('div');
     div.className = `msg ${role}`;
 
@@ -720,7 +667,13 @@
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble';
 
+    div.appendChild(label);
+    div.appendChild(bubble);
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
     if (isHTML) {
+      // Lien de paiement — pas d'effet machine à écrire sur le HTML
       bubble.innerHTML = text;
       const payLink = bubble.querySelector('.lisa-pay-link');
       if (payLink) {
@@ -729,16 +682,30 @@
           showPaywall();
         });
       }
+      // Réactive l'input après affichage
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+      inputEl.focus();
+
+    } else if (animate && role === 'ai') {
+      // Effet machine à écrire pour les messages de Lisa
+      typewriterEffect(bubble, text, () => {
+        inputEl.disabled = false;
+        sendBtn.disabled = false;
+        inputEl.focus();
+      });
+
     } else {
+      // Affichage immédiat (messages user ou restauration historique)
       bubble.textContent = text;
     }
 
-    div.appendChild(label);
-    div.appendChild(bubble);
-    messagesEl.appendChild(div);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return bubble;
   }
 
+  // ============================================================
+  // INDICATEUR DE FRAPPE (pendant l'appel API)
+  // ============================================================
   function addTyping() {
     const div = document.createElement('div');
     div.className = 'msg ai';
@@ -749,6 +716,58 @@
     `;
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  // ============================================================
+  // SESSION 24H
+  // ============================================================
+  function loadSession() {
+    const raw = localStorage.getItem(KEY_SESSION);
+    if (!raw) return;
+    const session = JSON.parse(raw);
+    if (Date.now() > session.expires) {
+      localStorage.removeItem(KEY_SESSION);
+      return;
+    }
+    isPaid  = true;
+    history = session.history || [];
+    updateSessionBadge(session.expires);
+  }
+
+  function saveSession() {
+    const raw = localStorage.getItem(KEY_SESSION);
+    if (!raw) return;
+    const session = JSON.parse(raw);
+    session.history = history;
+    localStorage.setItem(KEY_SESSION, JSON.stringify(session));
+  }
+
+  function createSession() {
+    const session = {
+      paidAt:  Date.now(),
+      expires: Date.now() + SESSION_DURATION,
+      history: history,
+    };
+    localStorage.setItem(KEY_SESSION, JSON.stringify(session));
+    isPaid = true;
+    updateSessionBadge(session.expires);
+  }
+
+  function updateSessionBadge(expires) {
+    sessionBadge.classList.add('show');
+    function tick() {
+      const remaining = expires - Date.now();
+      if (remaining <= 0) {
+        sessionBadge.classList.remove('show');
+        isPaid = false;
+        return;
+      }
+      const h = Math.floor(remaining / 3600000);
+      const m = Math.floor((remaining % 3600000) / 60000);
+      sessionTimer.textContent = `${h}h${m < 10 ? '0' : ''}${m}`;
+    }
+    tick();
+    setInterval(tick, 60000);
   }
 
   // ============================================================
@@ -764,9 +783,28 @@
   }
 
   // ============================================================
+  // DÉMARRAGE
+  // ============================================================
+  function startChat() {
+    if (isPaid && history.length > 0) {
+      // Restaure l'historique sans animation
+      history.forEach(msg => {
+        addMessage(msg.role === 'user' ? 'user' : 'ai', msg.content, false, false);
+      });
+      // Message de retour avec animation
+      setTimeout(() => {
+        addMessage('ai', "Te revoilà 🖤 On reprend là où on en était ?", false, true);
+      }, 300);
+    } else {
+      addMessage('ai', "Salut... T'es venu pour te vider ? Dis-moi un mot.", false, true);
+    }
+  }
+
+  // ============================================================
   // ENVOI DE MESSAGE
   // ============================================================
   async function sendMessage() {
+    if (isTyping) return; // Bloque pendant l'effet machine à écrire
     const text = inputEl.value.trim();
     if (!text) return;
 
@@ -775,10 +813,8 @@
     sendBtn.disabled = true;
     inputEl.disabled = true;
 
-    addMessage('user', text);
+    addMessage('user', text, false, false);
     history.push({ role: 'user', content: text });
-
-    // Sauvegarde l'historique si session payante active
     if (isPaid) saveSession();
 
     addTyping();
@@ -793,40 +829,37 @@
       const data = await res.json();
       document.getElementById('typing')?.remove();
 
-      // Chat terminé après 3 boucles sans paiement
       if (data.endChat) {
-        addMessage('ai', data.reply);
-        setTimeout(closeChat, 1500);
+        // Message de fin avec effet machine à écrire
+        addMessage('ai', data.reply, false, true);
+        setTimeout(closeChat, data.reply.length * CHAR_SPEED_NORMAL + 2000);
         return;
       }
 
-      addMessage('ai', data.reply, data.hasPayLink);
+      // Réponse normale — avec effet machine à écrire
+      // Si la réponse contient un lien HTML → pas d'animation
+      addMessage('ai', data.reply, data.hasPayLink, !data.hasPayLink);
       history.push({ role: 'assistant', content: data.reply });
-
-      // Sauvegarde après chaque réponse si payant
       if (isPaid) saveSession();
 
-      // Passe à la boucle suivante si Lisa a montré un lien
       if (data.hasPayLink && !loopPayLinkShown) {
         loopPayLinkShown = true;
         currentLoop = data.nextLoop;
+        // Réactive l'input immédiatement si lien HTML
+        inputEl.disabled = false;
+        sendBtn.disabled = false;
+        inputEl.focus();
       }
-
-      inputEl.disabled = false;
-      sendBtn.disabled = false;
-      inputEl.focus();
 
     } catch (err) {
       console.error(err);
       document.getElementById('typing')?.remove();
-      addMessage('ai', "J'ai un souci technique... réessaie.");
-      inputEl.disabled = false;
-      sendBtn.disabled = false;
+      addMessage('ai', "J'ai un souci technique... réessaie.", false, true);
     }
   }
 
   // ============================================================
-  // PAIEMENT STRIPE
+  // PAIEMENT
   // ============================================================
   async function goToCheckout() {
     try {
@@ -865,22 +898,45 @@
   });
 
   // ============================================================
-  // RETOUR APRÈS PAIEMENT STRIPE
-  // Stripe redirige vers /?success=1 après paiement confirmé
+  // RETOUR STRIPE
   // ============================================================
   const params = new URLSearchParams(window.location.search);
   if (params.get('success') === '1') {
-    createSession(); // Crée la session 24h
+    createSession();
     banner.classList.add('show');
     setTimeout(() => banner.classList.remove('show'), 4000);
     window.history.replaceState({}, '', '/');
-    // Lisa accueille l'utilisateur qui vient de payer
-    addMessage('ai', "Te voilà. On peut vraiment y aller maintenant.");
   }
 
   // ============================================================
-  // LANCEMENT
+  // VÉRIFICATION ÂGE
   // ============================================================
+  function init() {
+    if (localStorage.getItem(KEY_BANNED) === 'true') {
+      bannedScreen.classList.add('show');
+      return;
+    }
+    if (!localStorage.getItem(KEY_AGE)) {
+      ageGate.classList.add('show');
+      return;
+    }
+    loadSession();
+    startChat();
+  }
+
+  document.getElementById('btn-yes').addEventListener('click', () => {
+    localStorage.setItem(KEY_AGE, 'true');
+    ageGate.classList.remove('show');
+    loadSession();
+    startChat();
+  });
+
+  document.getElementById('btn-no').addEventListener('click', () => {
+    localStorage.setItem(KEY_BANNED, 'true');
+    ageGate.classList.remove('show');
+    bannedScreen.classList.add('show');
+  });
+
   init();
 </script>
 </body>
