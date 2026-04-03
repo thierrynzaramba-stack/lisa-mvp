@@ -1,83 +1,90 @@
-// api/chat.js — Vercel Serverless Function
-// Gère les 3 boucles de vente (mode gratuit) et le mode payant
-// Utilise lisa.free.prompt.js et lisa.paid.prompt.js
+// api/chat.js
+// Version simplifiée — prompt clair, pas de boucles complexes
 
-const LISA        = require('../lisa.config.js');
-const LISA_FREE   = require('../lisa.free.prompt.js');
-const LISA_PAID   = require('../lisa.paid.prompt.js');
+const LISA      = require('../lisa.config.js');
+const LISA_FREE = require('../lisa.free.prompt.js');
+const LISA_PAID = require('../lisa.paid.prompt.js');
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // On reçoit : la conversation, si l'utilisateur est payant,
-  // et le numéro de boucle en cours (1, 2 ou 3)
-  const { messages, isPaid, loop = 1 } = req.body;
+  const { messages, isPaid, payLinkCount = 0 } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: 'Invalid messages' });
   }
 
-  // --------------------------------------------------------
-  // MODE PAYANT
-  // Lisa est pleinement disponible, sans objectif de vente
-  // --------------------------------------------------------
-  if (isPaid) {
-    const systemPrompt = buildPaidPrompt();
-    const reply = await callGrok(systemPrompt, messages);
-    return res.status(200).json({ reply, isPaid: true });
-  }
-
-  // --------------------------------------------------------
-  // MODE GRATUIT — 3 BOUCLES DE VENTE
-  // loop 1 → lien + réciprocité
-  // loop 2 → getting to no + cohérence
-  // loop 3 → rareté + retrait + étiquetage + question calibrée
-  // loop 4 → fin de conversation (chat fermé)
-  // --------------------------------------------------------
-
-  // Si on a dépassé les 3 boucles → fermer le chat
-  if (loop > 3) {
+  // Fermeture du chat après 3 liens ignorés
+  if (!isPaid && payLinkCount >= 3) {
+    const nom = extractFirstName(messages);
+    const fin = LISA_FREE.fin.replace('[prénom]', nom ? nom : '');
     return res.status(200).json({
-      reply: LISA_FREE.fin_conversation.message_defaut,
-      endChat: true, // Signal au frontend pour fermer le chat
+      reply: fin,
+      endChat: true,
       hasPayLink: false,
     });
   }
 
-  // Construction du prompt selon la boucle en cours
-  const systemPrompt = buildFreePrompt(loop);
-  const rawReply = await callGrok(systemPrompt, messages);
+  const systemPrompt = isPaid
+    ? buildPaidPrompt()
+    : buildFreePrompt(payLinkCount);
 
-  // Détecte si Lisa a placé un lien de paiement
-  const hasPayLink = rawReply.includes('[PAYMENT_LINK]');
+  try {
+    const rawReply = await callGrok(systemPrompt, messages);
+    const hasPayLink = rawReply.includes('[PAYMENT_LINK]');
 
-  // Sélectionne le texte du lien selon la boucle
-  const boucle = getBoucle(loop);
+    const reply = rawReply.replace(
+      '[PAYMENT_LINK]',
+      `<a href="#pay" class="lisa-pay-link">${LISA.texte_lien_paiement}</a>`
+    ).trim();
 
-  // Remplace le token par un vrai lien HTML cliquable
-  const reply = rawReply.replace(
-    '[PAYMENT_LINK]',
-    `<a href="#pay" class="lisa-pay-link">${boucle.texte_lien}</a>`
-  ).trim();
+    return res.status(200).json({
+      reply,
+      hasPayLink,
+      endChat: false,
+      nextPayLinkCount: hasPayLink ? payLinkCount + 1 : payLinkCount,
+    });
 
-  // Si Lisa a placé un lien → on signale au frontend
-  // que la boucle est terminée (prête pour la suivante si refus)
-  return res.status(200).json({
-    reply,
-    hasPayLink,
-    loop,             // Boucle actuelle
-    nextLoop: loop + 1, // Prochaine boucle si l'utilisateur ne paie pas
-    endChat: false,
-  });
+  } catch (error) {
+    console.error('Server error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 }
 
 // ============================================================
-// CONSTRUCTION DES PROMPTS
+// PROMPT MODE GRATUIT
 // ============================================================
+function buildFreePrompt(payLinkCount) {
+  return `
+Tu es ${LISA.name}.
 
-// Prompt mode payant — libéré de toute vente
+RÈGLE ABSOLUE :
+${LISA_FREE.longueur}
+
+CARACTÈRE :
+${LISA_FREE.caractere}
+
+EMOJIS :
+${LISA_FREE.emojis}
+
+STRATÉGIE :
+${LISA_FREE.strategie_vente}
+
+${payLinkCount > 0 ? `
+TU AS DÉJÀ PROPOSÉ LE LIEN ${payLinkCount} FOIS.
+${LISA_FREE.si_ignore}
+` : ''}
+
+Réponds en français, tutoiement.
+1 PHRASE MAXIMUM. Jamais de pavé. Jamais de liste.
+  `.trim();
+}
+
+// ============================================================
+// PROMPT MODE PAYANT
+// ============================================================
 function buildPaidPrompt() {
   return `
 Tu es ${LISA.name}.
@@ -86,69 +93,21 @@ CARACTÈRE :
 ${LISA_PAID.caractere}
 
 CE QUE TU PEUX FAIRE :
-${LISA_PAID.peut_faire.map(r => `- ${r}`).join('\n')}
-
-CE QUE TU NE FAIS PAS :
-${LISA_PAID.ne_faire_pas ? LISA_PAID.ne_faire_pas.map(r => `- ${r}`).join('\n') : ''}
+${(LISA_PAID.peut_faire || []).map(r => `- ${r}`).join('\n')}
 
 RYTHME :
 ${LISA_PAID.rythme}
 
-ACTIONS :
-${LISA_PAID.actions.map(r => `- ${r}`).join('\n')}
+EMOJIS :
+${LISA_FREE.emojis}
 
-MIMIQUES (tes expressions naturelles) :
-${LISA_PAID.mimiques.map(r => `- "${r}"`).join('\n')}
-
-Réponds toujours en français, tutoiement.
-Cet utilisateur a payé — tu n'as aucun objectif de vente.
+Réponds en français, tutoiement.
+Tu n'as aucun objectif de vente. Sois pleinement présente.
   `.trim();
-}
-
-// Prompt mode gratuit — avec instructions de la boucle en cours
-function buildFreePrompt(loop) {
-  const boucle = getBoucle(loop);
-
-  return `
-Tu es ${LISA.name}.
-
-CARACTÈRE :
-${LISA_FREE.caractere}
-
-MIMIQUES (tes expressions naturelles) :
-${LISA_FREE.mimiques.map(r => `- "${r}"`).join('\n')}
-
-${LISA.personnalite}
-
----
-
-TU ES EN BOUCLE ${loop}/3 — ${boucle.nom}
-${boucle.description}
-
-INSTRUCTIONS POUR CETTE BOUCLE :
-${boucle.instructions}
-
-PRIX À MENTIONNER : ${boucle.prix}${boucle.prix_barre ? ` au lieu de ${boucle.prix_barre}` : ''}
-
-Quand le moment est venu selon les instructions ci-dessus,
-place le token [PAYMENT_LINK] UNE SEULE FOIS dans ta réponse.
-Il sera remplacé automatiquement par un lien cliquable.
-Ne mentionne JAMAIS les mots : abonnement, offre, plan, manipulation.
-
-Réponds toujours en français, tutoiement, naturellement.
-  `.trim();
-}
-
-// Retourne la boucle correspondante depuis le prompt
-function getBoucle(loop) {
-  if (loop === 1) return LISA_FREE.boucle_1;
-  if (loop === 2) return LISA_FREE.boucle_2;
-  if (loop === 3) return LISA_FREE.boucle_3;
-  return LISA_FREE.boucle_3;
 }
 
 // ============================================================
-// APPEL API GROK
+// APPEL GROK
 // ============================================================
 async function callGrok(systemPrompt, messages) {
   const response = await fetch('https://api.x.ai/v1/chat/completions', {
@@ -159,8 +118,8 @@ async function callGrok(systemPrompt, messages) {
     },
     body: JSON.stringify({
       model: 'grok-3-latest',
-      max_tokens: 400,
-      temperature: 1.2, // Plus créatif et inventif qu'en mode standard
+      max_tokens: 150,       // Court — force des réponses brèves
+      temperature: 1.2,      // Créatif et inventif
       messages: [
         { role: 'system', content: systemPrompt },
         ...messages
@@ -171,9 +130,23 @@ async function callGrok(systemPrompt, messages) {
   if (!response.ok) {
     const err = await response.text();
     console.error('Grok API error:', err);
-    throw new Error('Grok API error: ' + err);
+    throw new Error(err);
   }
 
   const data = await response.json();
   return data.choices?.[0]?.message?.content || '';
+}
+
+// ============================================================
+// UTILITAIRE — extrait le prénom de la conversation
+// ============================================================
+function extractFirstName(messages) {
+  // Cherche un prénom dans les messages utilisateur
+  for (const msg of messages) {
+    if (msg.role === 'user') {
+      const match = msg.content.match(/je m'appelle (\w+)|mon prénom c'est (\w+)|c'est (\w+)/i);
+      if (match) return match[1] || match[2] || match[3];
+    }
+  }
+  return null;
 }
