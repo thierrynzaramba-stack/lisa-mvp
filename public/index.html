@@ -32,6 +32,116 @@
       align-items: center;
     }
 
+    /* --------------------------------------------------------
+       ÉCRAN DE VÉRIFICATION D'ÂGE
+       Affiché à la première visite — bloque les mineurs
+    -------------------------------------------------------- */
+    #age-gate {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: var(--bg);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    #age-gate.show { display: flex; }
+
+    .age-gate-logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 3rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .age-gate-title {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 3rem;
+    }
+
+    .age-gate-question {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.5rem;
+      margin-bottom: 2.5rem;
+      line-height: 1.4;
+    }
+
+    .age-gate-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-major {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 1rem 2rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-major:hover { opacity: 0.85; }
+
+    .btn-minor {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 1rem 2rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .btn-minor:hover { color: var(--text); }
+
+    /* --------------------------------------------------------
+       ÉCRAN MINEUR BANNI
+       Affiché si l'utilisateur dit qu'il a moins de 18 ans
+    -------------------------------------------------------- */
+    #banned-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: var(--bg);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    #banned-screen.show { display: flex; }
+
+    .banned-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .banned-text {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.9;
+      max-width: 360px;
+    }
+
+    /* --------------------------------------------------------
+       HEADER
+    -------------------------------------------------------- */
     header {
       width: 100%;
       max-width: 680px;
@@ -46,7 +156,6 @@
       font-family: 'Instrument Serif', serif;
       font-size: 2rem;
       color: var(--accent);
-      letter-spacing: -0.02em;
     }
 
     .tagline {
@@ -56,6 +165,21 @@
       text-transform: uppercase;
     }
 
+    /* Badge session active (mode payant) */
+    #session-badge {
+      display: none;
+      margin-left: auto;
+      font-size: 0.62rem;
+      color: var(--accent);
+      border: 1px solid var(--accent-dim);
+      padding: 0.3rem 0.7rem;
+      letter-spacing: 0.08em;
+    }
+    #session-badge.show { display: block; }
+
+    /* --------------------------------------------------------
+       CHAT
+    -------------------------------------------------------- */
     main {
       width: 100%;
       max-width: 680px;
@@ -122,6 +246,7 @@
       max-width: 100%;
     }
 
+    /* Lien de paiement dans la bulle */
     .lisa-pay-link {
       display: inline-block;
       margin-top: 0.5rem;
@@ -133,9 +258,9 @@
       cursor: pointer;
       transition: opacity 0.2s;
     }
-
     .lisa-pay-link:hover { opacity: 0.75; }
 
+    /* Typing */
     .typing {
       display: flex;
       gap: 4px;
@@ -145,7 +270,6 @@
       border-left: 2px solid var(--accent);
       width: fit-content;
     }
-
     .typing span {
       width: 5px; height: 5px;
       background: var(--accent);
@@ -160,6 +284,7 @@
       40% { opacity: 1; }
     }
 
+    /* Zone de saisie */
     .input-area {
       border-top: 1px solid var(--border);
       padding: 1.2rem 0 2rem;
@@ -184,7 +309,6 @@
       transition: border-color 0.2s;
       line-height: 1.5;
     }
-
     textarea:focus { border-color: var(--accent); }
     textarea::placeholder { color: var(--muted); }
     textarea:disabled { opacity: 0.3; cursor: not-allowed; }
@@ -202,10 +326,41 @@
       cursor: pointer;
       transition: opacity 0.2s;
     }
-
     button#send-btn:hover { opacity: 0.85; }
     button#send-btn:disabled { opacity: 0.25; cursor: not-allowed; }
 
+    /* Fin de chat */
+    #end-chat-banner {
+      display: none;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 0 2rem;
+      text-align: center;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    #end-chat-banner.show { display: flex; }
+
+    .end-chat-text {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .btn-end-pay {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 1rem 2rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-end-pay:hover { opacity: 0.85; }
+
+    /* Paywall */
     #paywall {
       display: none;
       position: fixed;
@@ -217,7 +372,6 @@
       justify-content: center;
       padding: 2rem;
     }
-
     #paywall.show { display: flex; }
 
     .paywall-card {
@@ -251,11 +405,23 @@
       margin-bottom: 1.5rem;
     }
 
+    .paywall-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      margin-bottom: 0.3rem;
+    }
+
     .paywall-price {
       font-family: 'Instrument Serif', serif;
       font-size: 2.2rem;
       color: var(--accent);
-      margin-bottom: 0.2rem;
+    }
+
+    .paywall-price-strike {
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-decoration: line-through;
     }
 
     .paywall-price-note {
@@ -279,7 +445,6 @@
       transition: opacity 0.2s;
       margin-bottom: 0.8rem;
     }
-
     .btn-pay:hover { opacity: 0.85; }
 
     .btn-dismiss {
@@ -294,7 +459,6 @@
       cursor: pointer;
       transition: color 0.2s;
     }
-
     .btn-dismiss:hover { color: var(--text); }
 
     #success-banner {
@@ -311,65 +475,251 @@
       padding: 0.75rem 2rem;
       z-index: 200;
     }
-
     #success-banner.show { display: block; }
   </style>
 </head>
 <body>
 
+<!-- ============================================================
+     ÉCRAN VÉRIFICATION ÂGE
+     Affiché à chaque première visite (ou si localStorage vide)
+============================================================ -->
+<div id="age-gate">
+  <div class="age-gate-logo">Lisa</div>
+  <div class="age-gate-title">Service réservé aux adultes</div>
+  <div class="age-gate-question">As-tu 18 ans ou plus ?</div>
+  <div class="age-gate-buttons">
+    <button class="btn-major" id="btn-yes">Oui, j'ai 18 ans ou plus</button>
+    <button class="btn-minor" id="btn-no">Non</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     ÉCRAN BANNI (mineur)
+============================================================ -->
+<div id="banned-screen">
+  <div class="banned-title">Accès refusé.</div>
+  <div class="banned-text">
+    Lisa est un service réservé aux personnes majeures.<br/><br/>
+    Tu ne peux pas accéder à ce service.
+  </div>
+</div>
+
+<!-- ============================================================
+     INTERFACE PRINCIPALE
+============================================================ -->
 <header>
   <div class="logo">Lisa</div>
   <div class="tagline">Dis-moi ce que tu portes.</div>
+  <div id="session-badge">✓ Session active — <span id="session-timer"></span></div>
 </header>
 
 <main>
   <div id="messages"></div>
-  <div class="input-area">
-    <textarea id="input" rows="1" placeholder="Écris ici…" autofocus></textarea>
+
+  <div class="input-area" id="input-area">
+    <textarea id="input" rows="1" placeholder="Écris ici…"></textarea>
     <button id="send-btn">Envoyer</button>
+  </div>
+
+  <div id="end-chat-banner">
+    <div class="end-chat-text">Cette conversation est terminée.</div>
+    <button class="btn-end-pay" id="end-pay-btn">Reprendre pour 3.99€ →</button>
   </div>
 </main>
 
+<!-- Paywall -->
 <div id="paywall">
   <div class="paywall-card">
-    <div class="paywall-eyebrow">Continuer avec Lisa</div>
-    <div class="paywall-title">Tu mérites d'aller jusqu'au bout.</div>
+    <div class="paywall-eyebrow">Session 24h avec Lisa</div>
+    <div class="paywall-title">Allons vraiment au fond.</div>
     <div class="paywall-desc">
-      Cette conversation peut aller plus loin.<br/>
-      Débloque un accès illimité pour continuer avec Lisa.
+      24h de conversation illimitée avec Lisa.<br/>
+      Elle se souvient de tout ce qu'on s'est dit.<br/>
+      Accès immédiat, aucun compte requis.
     </div>
-    <div class="paywall-price">9€</div>
-    <div class="paywall-price-note">Paiement unique · Accès à vie</div>
-    <button class="btn-pay" id="pay-btn">Continuer →</button>
+    <div class="paywall-price-row">
+      <span class="paywall-price">3.99€</span>
+      <span class="paywall-price-strike">90€</span>
+    </div>
+    <div class="paywall-price-note">Paiement unique · Session 24h · Accès immédiat</div>
+    <button class="btn-pay" id="pay-btn">Commencer ma session →</button>
     <button class="btn-dismiss" id="dismiss-btn">Pas maintenant</button>
   </div>
 </div>
 
-<div id="success-banner">✓ Accès débloqué</div>
+<div id="success-banner">✓ Session activée — bienvenue</div>
 
 <script>
-  const PAID_KEY = 'lisa_paid';
-  let isPaid = localStorage.getItem(PAID_KEY) === 'true';
-  let history = [];
+  // ============================================================
+  // CLÉS LOCALSTORAGE
+  // ============================================================
+  const KEY_AGE       = 'lisa_age_ok';      // Vérification âge
+  const KEY_BANNED    = 'lisa_banned';       // Mineur banni
+  const KEY_SESSION   = 'lisa_session';      // Session payante
+  const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24h en ms
 
-  const messagesEl = document.getElementById('messages');
-  const inputEl    = document.getElementById('input');
-  const sendBtn    = document.getElementById('send-btn');
-  const paywall    = document.getElementById('paywall');
-  const payBtn     = document.getElementById('pay-btn');
-  const dismissBtn = document.getElementById('dismiss-btn');
-  const banner     = document.getElementById('success-banner');
+  // ============================================================
+  // ÉTAT DE L'APPLICATION
+  // ============================================================
+  let isPaid      = false;   // Session payante active
+  let history     = [];      // Historique de conversation
+  let currentLoop = 1;       // Boucle de vente en cours (1-3)
+  let loopPayLinkShown = false;
 
-  addMessage('ai', "Salut... T'es venu pour te vider ? Dis-moi un mot.");
+  // ============================================================
+  // ÉLÉMENTS DOM
+  // ============================================================
+  const ageGate      = document.getElementById('age-gate');
+  const bannedScreen = document.getElementById('banned-screen');
+  const messagesEl   = document.getElementById('messages');
+  const inputEl      = document.getElementById('input');
+  const sendBtn      = document.getElementById('send-btn');
+  const inputArea    = document.getElementById('input-area');
+  const endBanner    = document.getElementById('end-chat-banner');
+  const sessionBadge = document.getElementById('session-badge');
+  const sessionTimer = document.getElementById('session-timer');
+  const paywall      = document.getElementById('paywall');
+  const payBtn       = document.getElementById('pay-btn');
+  const endPayBtn    = document.getElementById('end-pay-btn');
+  const dismissBtn   = document.getElementById('dismiss-btn');
+  const banner       = document.getElementById('success-banner');
 
+  // ============================================================
+  // INITIALISATION — vérifie l'état au chargement
+  // ============================================================
+  function init() {
+
+    // 1. Mineur déjà banni → écran bloqué définitivement
+    if (localStorage.getItem(KEY_BANNED) === 'true') {
+      bannedScreen.classList.add('show');
+      return;
+    }
+
+    // 2. Vérification d'âge pas encore faite → afficher l'écran
+    if (!localStorage.getItem(KEY_AGE)) {
+      ageGate.classList.add('show');
+      return;
+    }
+
+    // 3. Âge vérifié → charger la session si elle existe
+    loadSession();
+    startChat();
+  }
+
+  // ============================================================
+  // VÉRIFICATION D'ÂGE
+  // ============================================================
+  document.getElementById('btn-yes').addEventListener('click', () => {
+    // Majeur confirmé → on stocke et on lance le chat
+    localStorage.setItem(KEY_AGE, 'true');
+    ageGate.classList.remove('show');
+    loadSession();
+    startChat();
+  });
+
+  document.getElementById('btn-no').addEventListener('click', () => {
+    // Mineur → bannissement permanent
+    localStorage.setItem(KEY_BANNED, 'true');
+    ageGate.classList.remove('show');
+    bannedScreen.classList.add('show');
+  });
+
+  // ============================================================
+  // GESTION DE LA SESSION PAYANTE (localStorage 24h)
+  // ============================================================
+  function loadSession() {
+    const raw = localStorage.getItem(KEY_SESSION);
+    if (!raw) return;
+
+    const session = JSON.parse(raw);
+    const now = Date.now();
+
+    // Session expirée → on la supprime
+    if (now > session.expires) {
+      localStorage.removeItem(KEY_SESSION);
+      return;
+    }
+
+    // Session encore valide
+    isPaid   = true;
+    history  = session.history || [];
+
+    // Affiche le badge de session avec le temps restant
+    updateSessionBadge(session.expires);
+  }
+
+  function saveSession() {
+    // Sauvegarde l'historique dans la session en cours
+    const raw = localStorage.getItem(KEY_SESSION);
+    if (!raw) return;
+    const session = JSON.parse(raw);
+    session.history = history;
+    localStorage.setItem(KEY_SESSION, JSON.stringify(session));
+  }
+
+  function createSession() {
+    // Crée une nouvelle session de 24h après paiement
+    const session = {
+      paidAt:  Date.now(),
+      expires: Date.now() + SESSION_DURATION,
+      history: history, // On garde la conversation déjà commencée
+    };
+    localStorage.setItem(KEY_SESSION, JSON.stringify(session));
+    isPaid = true;
+    updateSessionBadge(session.expires);
+  }
+
+  function updateSessionBadge(expires) {
+    // Affiche le temps restant dans le header
+    sessionBadge.classList.add('show');
+
+    function tick() {
+      const remaining = expires - Date.now();
+      if (remaining <= 0) {
+        sessionBadge.classList.remove('show');
+        isPaid = false;
+        return;
+      }
+      const h = Math.floor(remaining / 3600000);
+      const m = Math.floor((remaining % 3600000) / 60000);
+      sessionTimer.textContent = `${h}h${m < 10 ? '0' : ''}${m} restantes`;
+    }
+
+    tick();
+    setInterval(tick, 60000); // Met à jour toutes les minutes
+  }
+
+  // ============================================================
+  // DÉMARRAGE DU CHAT
+  // ============================================================
+  function startChat() {
+    // Si session payante avec historique → restaurer la conversation
+    if (isPaid && history.length > 0) {
+      history.forEach(msg => {
+        addMessage(msg.role === 'user' ? 'user' : 'ai', msg.content);
+      });
+      addMessage('ai', "Te revoilà. On reprend là où on en était ?");
+    } else {
+      // Nouveau chat
+      addMessage('ai', "Salut... T'es venu pour te vider ? Dis-moi un mot.");
+    }
+  }
+
+  // ============================================================
+  // MESSAGES
+  // ============================================================
   function addMessage(role, text, isHTML = false) {
     const div = document.createElement('div');
     div.className = `msg ${role}`;
+
     const label = document.createElement('div');
     label.className = 'msg-label';
     label.textContent = role === 'user' ? 'Toi' : 'Lisa';
+
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble';
+
     if (isHTML) {
       bubble.innerHTML = text;
       const payLink = bubble.querySelector('.lisa-pay-link');
@@ -382,6 +732,7 @@
     } else {
       bubble.textContent = text;
     }
+
     div.appendChild(label);
     div.appendChild(bubble);
     messagesEl.appendChild(div);
@@ -400,12 +751,21 @@
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
+  // ============================================================
+  // PAYWALL
+  // ============================================================
   function showPaywall() {
     paywall.classList.add('show');
-    inputEl.disabled = true;
-    sendBtn.disabled = true;
   }
 
+  function closeChat() {
+    inputArea.style.display = 'none';
+    endBanner.classList.add('show');
+  }
+
+  // ============================================================
+  // ENVOI DE MESSAGE
+  // ============================================================
   async function sendMessage() {
     const text = inputEl.value.trim();
     if (!text) return;
@@ -418,26 +778,46 @@
     addMessage('user', text);
     history.push({ role: 'user', content: text });
 
+    // Sauvegarde l'historique si session payante active
+    if (isPaid) saveSession();
+
     addTyping();
 
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history, isPaid })
+        body: JSON.stringify({ messages: history, isPaid, loop: currentLoop })
       });
 
       const data = await res.json();
       document.getElementById('typing')?.remove();
 
+      // Chat terminé après 3 boucles sans paiement
+      if (data.endChat) {
+        addMessage('ai', data.reply);
+        setTimeout(closeChat, 1500);
+        return;
+      }
+
       addMessage('ai', data.reply, data.hasPayLink);
       history.push({ role: 'assistant', content: data.reply });
+
+      // Sauvegarde après chaque réponse si payant
+      if (isPaid) saveSession();
+
+      // Passe à la boucle suivante si Lisa a montré un lien
+      if (data.hasPayLink && !loopPayLinkShown) {
+        loopPayLinkShown = true;
+        currentLoop = data.nextLoop;
+      }
 
       inputEl.disabled = false;
       sendBtn.disabled = false;
       inputEl.focus();
 
-    } catch {
+    } catch (err) {
+      console.error(err);
       document.getElementById('typing')?.remove();
       addMessage('ai', "J'ai un souci technique... réessaie.");
       inputEl.disabled = false;
@@ -445,6 +825,22 @@
     }
   }
 
+  // ============================================================
+  // PAIEMENT STRIPE
+  // ============================================================
+  async function goToCheckout() {
+    try {
+      const res = await fetch('/api/create-checkout', { method: 'POST' });
+      const { url } = await res.json();
+      window.location.href = url;
+    } catch {
+      alert('Erreur de redirection — réessaie.');
+    }
+  }
+
+  // ============================================================
+  // ÉVÉNEMENTS
+  // ============================================================
   inputEl.addEventListener('input', () => {
     inputEl.style.height = 'auto';
     inputEl.style.height = Math.min(inputEl.scrollHeight, 140) + 'px';
@@ -458,32 +854,34 @@
   });
 
   sendBtn.addEventListener('click', sendMessage);
-
-  payBtn.addEventListener('click', async () => {
-    payBtn.textContent = 'Redirection…';
-    payBtn.disabled = true;
-    try {
-      const res = await fetch('/api/create-checkout', { method: 'POST' });
-      const { url } = await res.json();
-      window.location.href = url;
-    } catch {
-      payBtn.textContent = 'Erreur — Réessayer';
-      payBtn.disabled = false;
-    }
-  });
+  payBtn.addEventListener('click', goToCheckout);
+  endPayBtn.addEventListener('click', goToCheckout);
 
   dismissBtn.addEventListener('click', () => {
     paywall.classList.remove('show');
+    inputEl.disabled = false;
+    sendBtn.disabled = false;
+    inputEl.focus();
   });
 
+  // ============================================================
+  // RETOUR APRÈS PAIEMENT STRIPE
+  // Stripe redirige vers /?success=1 après paiement confirmé
+  // ============================================================
   const params = new URLSearchParams(window.location.search);
   if (params.get('success') === '1') {
-    isPaid = true;
-    localStorage.setItem(PAID_KEY, 'true');
+    createSession(); // Crée la session 24h
     banner.classList.add('show');
     setTimeout(() => banner.classList.remove('show'), 4000);
     window.history.replaceState({}, '', '/');
+    // Lisa accueille l'utilisateur qui vient de payer
+    addMessage('ai', "Te voilà. On peut vraiment y aller maintenant.");
   }
+
+  // ============================================================
+  // LANCEMENT
+  // ============================================================
+  init();
 </script>
 </body>
 </html>
