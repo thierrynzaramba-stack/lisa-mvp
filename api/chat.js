@@ -80,8 +80,7 @@ TU AS DÉJÀ PROPOSÉ LE LIEN ${payLinkCount} FOIS.
 ${LISA_FREE.si_ignore}
 ` : ''}
 
-Réponds en français, tutoiement.
-1 PHRASE MAXIMUM. Jamais de pavé. Jamais de liste.
+Réponds en français, tutoiement. Sois naturelle et humaine.
   `.trim();
 }
 
