@@ -1,5 +1,5 @@
 // api/create-checkout.js — Vercel Serverless Function
-// Creates a Stripe Checkout session
+// Crée une session Stripe Checkout
 
 import Stripe from 'stripe';
 
@@ -20,10 +20,10 @@ export default async function handler(req, res) {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: 'Aura — Accès illimité',
-              description: 'Accès à vie à Aura, votre IA conversationnelle personnelle.',
+              name: 'Accès portail web 24H',
+              description: 'Accès complet au service pendant 24 heures.',
             },
-            unit_amount: 900, // 9,00 €
+            unit_amount: 399, // 3,99 €
           },
           quantity: 1,
         },
