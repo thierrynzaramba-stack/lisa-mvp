@@ -601,10 +601,7 @@
 <!-- HEADER -->
 <header>
   <div class="logo">Lisa</div>
-  <div style="display:flex; flex-direction:column; gap:0.1rem;">
-    <div class="tagline">Dis-moi ce que tu portes.</div>
-    <div style="font-size:0.6rem; color:var(--accent); letter-spacing:0.08em; font-style:italic;">je suis là pour toi 🖤</div>
-  </div>
+  <div style="font-size:0.6rem; color:var(--accent); letter-spacing:0.08em; font-style:italic; align-self:flex-end; margin-bottom:0.2rem;">je suis là pour toi 🖤</div>
   <div class="header-badges">
     <div id="free-timer">5:00</div>
     <div id="session-badge">✓ Session — <span id="session-timer"></span></div>
@@ -1059,6 +1056,10 @@
   // ============================================================
   async function goToCheckout() {
     try {
+      // Sauvegarde l'historique en cours AVANT de partir vers Stripe
+      // Comme ça au retour on retrouve toute la conversation
+      localStorage.setItem('lisa_pending_history', JSON.stringify(history));
+
       const res = await fetch('/api/create-checkout', { method: 'POST' });
       const { url } = await res.json();
       window.location.href = url;
@@ -1080,11 +1081,17 @@
   endPayBtn.addEventListener('click', goToCheckout);
 
   // ============================================================
-  // RETOUR STRIPE
+  // RETOUR STRIPE — restaure l'historique et crée la session
   // ============================================================
   const params = new URLSearchParams(window.location.search);
   if (params.get('success') === '1') {
-    createSession();
+    // Récupère l'historique sauvegardé avant le départ vers Stripe
+    const pending = localStorage.getItem('lisa_pending_history');
+    if (pending) {
+      try { history = JSON.parse(pending); } catch { history = []; }
+      localStorage.removeItem('lisa_pending_history');
+    }
+    createSession(); // Crée la session 24h avec l'historique restauré
     banner.classList.add('show');
     setTimeout(() => banner.classList.remove('show'), 4000);
     window.history.replaceState({}, '', '/');
