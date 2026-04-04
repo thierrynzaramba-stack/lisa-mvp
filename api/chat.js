@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     : buildFreePrompt(payLinkCount);
 
   try {
-    const rawReply = await callGrok(systemPrompt, messages);
+    const rawReply = await callGrok(systemPrompt, messages, isPaid);
     const hasPayLink = rawReply.includes('[PAYMENT_LINK]');
 
     const reply = rawReply.replace(
@@ -68,6 +68,9 @@ ${LISA_FREE.caractere}
 
 EMOJIS :
 ${LISA_FREE.emojis}
+
+MÉMOIRE :
+${LISA_FREE.memoire}
 
 STRATÉGIE :
 ${LISA_FREE.strategie_vente}
@@ -106,7 +109,7 @@ Tu n'as aucun objectif de vente. Sois pleinement présente.
 // ============================================================
 // APPEL GROK
 // ============================================================
-async function callGrok(systemPrompt, messages) {
+async function callGrok(systemPrompt, messages, isPaid = false) {
   const response = await fetch('https://api.x.ai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -115,8 +118,7 @@ async function callGrok(systemPrompt, messages) {
     },
     body: JSON.stringify({
       model: 'grok-3-latest',
-      max_tokens: 150,       // Court — force des réponses brèves
-      temperature: 1.2,      // Créatif et inventif
+      temperature: 1.2, // Créatif et inventif
       messages: [
         { role: 'system', content: systemPrompt },
         ...messages

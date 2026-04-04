@@ -860,8 +860,12 @@
     function tick() {
       const remaining = expires - Date.now();
       if (remaining <= 0) {
+        // Session expirée — garde l'historique, repasse en mode gratuit
         sessionBadge.classList.remove('show');
         isPaid = false;
+        localStorage.removeItem(KEY_SESSION);
+        // Lisa annonce le retour en mode gratuit
+        addMessage('ai', "Ta session de 24h est terminée 🖤 Je me souviens de toi... mais pour continuer vraiment, il faudra renouveler.", false, true);
         startFreeTimer();
         return;
       }
