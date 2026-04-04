@@ -177,15 +177,15 @@
       padding: 0 1.5rem;
     }
 
-    /* Fenêtre de messages — plus haute pour ne pas couper les phrases */
+    /* Fenêtre de messages — encore agrandie */
     #messages {
       flex: 1;
       padding: 1.5rem 0;
       display: flex;
       flex-direction: column;
       gap: 1.2rem;
-      min-height: 70vh;   /* augmenté */
-      max-height: 70vh;   /* augmenté */
+      min-height: 75vh;
+      max-height: 75vh;
       overflow-y: auto;
       scrollbar-width: thin;
       scrollbar-color: var(--border) transparent;
@@ -601,7 +601,10 @@
 <!-- HEADER -->
 <header>
   <div class="logo">Lisa</div>
-  <div class="tagline">Dis-moi ce que tu portes.</div>
+  <div style="display:flex; flex-direction:column; gap:0.1rem;">
+    <div class="tagline">Dis-moi ce que tu portes.</div>
+    <div style="font-size:0.6rem; color:var(--accent); letter-spacing:0.08em; font-style:italic;">je suis là pour toi 🖤</div>
+  </div>
   <div class="header-badges">
     <div id="free-timer">5:00</div>
     <div id="session-badge">✓ Session — <span id="session-timer"></span></div>
@@ -700,7 +703,10 @@
     </div>
     <div class="paywall-price-note">Paiement unique · Session 24h · Accès immédiat</div>
     <button class="btn-pay" id="pay-btn">Commencer ma session →</button>
-    <button class="btn-dismiss" id="dismiss-btn">Pas maintenant</button>
+    <div style="font-size:0.6rem; color:var(--muted); text-align:center; margin-top:0.8rem; line-height:1.9;">
+      🔒 Paiement sécurisé via Stripe.<br/>
+      Seul <strong style="color:var(--text)">Stripe</strong> apparaîtra sur ton relevé bancaire.
+    </div>
   </div>
 </div>
 
@@ -749,7 +755,6 @@
   const paywall      = document.getElementById('paywall');
   const payBtn       = document.getElementById('pay-btn');
   const endPayBtn    = document.getElementById('end-pay-btn');
-  const dismissBtn   = document.getElementById('dismiss-btn');
   const banner       = document.getElementById('success-banner');
 
   // ============================================================
@@ -1073,12 +1078,6 @@
   sendBtn.addEventListener('click', sendMessage);
   payBtn.addEventListener('click', goToCheckout);
   endPayBtn.addEventListener('click', goToCheckout);
-  dismissBtn.addEventListener('click', () => {
-    paywall.classList.remove('show');
-    inputEl.disabled = false;
-    sendBtn.disabled = false;
-    inputEl.focus();
-  });
 
   // ============================================================
   // RETOUR STRIPE
