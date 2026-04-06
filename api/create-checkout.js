@@ -8,24 +8,11 @@ export default async function handler(req, res) {
 
   const origin = req.headers.origin || process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
 
+  // IDs LemonSqueezy
+  const STORE_ID   = '338276';
+  const VARIANT_ID = '1496850';
+
   try {
-    // Étape 1 — Récupère le Variant ID du produit
-    const productRes = await fetch('https://api.lemonsqueezy.com/v1/variants?filter[product_id]=952725', {
-      headers: {
-        'Authorization': `Bearer ${process.env.LEMONSQUEEZY_API_KEY}`,
-        'Accept': 'application/vnd.api+json',
-      }
-    });
-
-    const productData = await productRes.json();
-    const variantId = productData.data?.[0]?.id;
-
-    if (!variantId) {
-      console.error('Variant ID introuvable', productData);
-      return res.status(500).json({ error: 'Variant ID introuvable' });
-    }
-
-    // Étape 2 — Crée le checkout
     const checkoutRes = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {
       method: 'POST',
       headers: {
@@ -42,28 +29,16 @@ export default async function handler(req, res) {
               media: false,
               logo: false,
             },
-            checkout_data: {
-              custom: {
-                source: 'lisa-web'
-              }
-            },
             product_options: {
               redirect_url: `${origin}/?success=1`,
             },
-            expires_at: null,
           },
           relationships: {
             store: {
-              data: {
-                type: 'stores',
-                id: process.env.LEMONSQUEEZY_STORE_ID,
-              }
+              data: { type: 'stores', id: STORE_ID }
             },
             variant: {
-              data: {
-                type: 'variants',
-                id: variantId,
-              }
+              data: { type: 'variants', id: VARIANT_ID }
             }
           }
         }
@@ -74,7 +49,7 @@ export default async function handler(req, res) {
     const url = checkoutData.data?.attributes?.url;
 
     if (!url) {
-      console.error('URL checkout introuvable', checkoutData);
+      console.error('URL checkout introuvable', JSON.stringify(checkoutData));
       return res.status(500).json({ error: 'URL checkout introuvable' });
     }
 
