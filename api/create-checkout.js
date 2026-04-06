@@ -28,6 +28,7 @@ export default async function handler(req, res) {
               embed: false,
               media: false,
               logo: false,
+              billing_address: false,
             },
             product_options: {
               redirect_url: `${origin}/?success=1`,
